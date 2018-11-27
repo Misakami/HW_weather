@@ -1,7 +1,9 @@
-package com.example.misaka.hw_weather;
+package com.example.misaka.hw_weather.view;
 
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+
+import com.example.misaka.hw_weather.R;
 
 public class MainActivity extends AppCompatActivity {
 
