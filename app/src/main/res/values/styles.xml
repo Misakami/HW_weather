@@ -7,5 +7,8 @@
         <item name="colorPrimaryDark">@color/colorPrimaryDark</item>
         <item name="colorAccent">@color/colorAccent</item>
     </style>
-
+    <style name="animation_buttom">
+        <item name="android:windowEnterAnimation">@anim/window_up</item>
+        <item name="android:windowExitAnimation">@anim/window_down</item>
+    </style>
 </resources>

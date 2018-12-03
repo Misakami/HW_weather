@@ -6,7 +6,7 @@ public class County extends LitePalSupport {
     private int id;
     private String CountyName;
     private int Cityid;
-    private int Weatherid;
+    private String Weatherid;
 
     public int getId() {
         return id;
@@ -32,11 +32,11 @@ public class County extends LitePalSupport {
         Cityid = cityid;
     }
 
-    public int getWeatherid() {
+    public String getWeatherid() {
         return Weatherid;
     }
 
-    public void setWeatherid(int weatherid) {
+    public void setWeatherid(String weatherid) {
         Weatherid = weatherid;
     }
 }

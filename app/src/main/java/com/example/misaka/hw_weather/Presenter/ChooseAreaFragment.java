@@ -1,6 +1,7 @@
 package com.example.misaka.hw_weather.Presenter;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -21,9 +22,9 @@ import com.example.misaka.hw_weather.model.db.County;
 import com.example.misaka.hw_weather.model.db.Province;
 import com.example.misaka.hw_weather.model.util.Httpclient;
 import com.example.misaka.hw_weather.model.util.Utility;
+import com.example.misaka.hw_weather.view.WeatherActivity;
 
 import org.litepal.LitePal;
-import org.litepal.crud.LitePalSupport;
 
 import java.io.IOException;
 import java.util.ArrayList;
@@ -80,6 +81,13 @@ public class ChooseAreaFragment extends Fragment {
                 } else if (level == LEVEL_CITY) {
                     selectetedCity = cityList.get(position);
                     queryCounty();
+                }else if (level == LEVEL_COUNTY){
+                    selectedCounty = countyList.get(position);
+                    WeatherActivity weatherActivity = (WeatherActivity) getActivity();
+                    weatherActivity.drawerLayout.closeDrawers();
+                    weatherActivity.addList(selectedCounty.getWeatherid());
+                    level = LEVEL_PROVINCE;
+                    queryProvinces();
                 }
             }
         });
