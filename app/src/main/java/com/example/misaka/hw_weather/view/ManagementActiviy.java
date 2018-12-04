@@ -2,15 +2,18 @@ package com.example.misaka.hw_weather.view;
 
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v4.content.res.ResourcesCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
+import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
@@ -39,6 +42,7 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
     private Button back;
     private Button change;
     private List<String> pageList;
+    private DailyWeatherAdapter dailyWeatherAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -59,7 +63,7 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
         recyclerView = findViewById(R.id.Manager_recyclerview);
         GridLayoutManager gridLayoutManager = new GridLayoutManager(this, 1);
         recyclerView.setLayoutManager(gridLayoutManager);
-        DailyWeatherAdapter dailyWeatherAdapter = new DailyWeatherAdapter(dailyweathers);
+        dailyWeatherAdapter = new DailyWeatherAdapter(dailyweathers);
         recyclerView.setAdapter(dailyWeatherAdapter);
 
         back.setOnClickListener(this);
@@ -82,31 +86,50 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
                     finish();
                 } else {
                     chosseboolean = false;
-                    change.setText("");
-                    back.setText("");
-                    dailyweathers = dailyweathersbackups;
+                    Drawable setdo = ResourcesCompat.getDrawable(getResources(), R.drawable.setdo, null);
+                    change.setBackground(setdo);
+                    Drawable goback = ResourcesCompat.getDrawable(getResources(), R.drawable.goback, null);
+                    back.setBackground(goback);
+                    dailyweathers.clear();
+                    dailyweathers.addAll(dailyweathersbackups);
+                    runOnUiThread(new Runnable() {
+                        @Override
+                        public void run() {
+                            dailyWeatherAdapter.notifyDataSetChanged();
+                        }
+                    });
                     touchHelper.attachToRecyclerView(null);
                 }
                 break;
             case R.id.change:
                 if (!chosseboolean) {
                     chosseboolean = true;
-                    change.setText("完成");
-                    back.setText("取消");
-                    dailyweathersbackups = dailyweathers;
+                    Drawable doit = ResourcesCompat.getDrawable(getResources(), R.drawable.doit, null);
+                    Drawable cancel = ResourcesCompat.getDrawable(getResources(), R.drawable.cancel, null);
+                    change.setBackground(doit);
+                    back.setBackground(cancel);
+                    dailyweathersbackups = new ArrayList<>();
+                    dailyweathersbackups.addAll(dailyweathers);
                     touchHelper.attachToRecyclerView(recyclerView);
                 } else {
                     chosseboolean = false;
-                    change.setText("");
-                    back.setText("");
+                    Drawable setdo = ResourcesCompat.getDrawable(getResources(), R.drawable.setdo, null);
+                    change.setBackground(setdo);
+                    Drawable goback = ResourcesCompat.getDrawable(getResources(), R.drawable.goback, null);
+                    back.setBackground(goback);
                     List<String> page = new ArrayList<>();
-                    for (Dailyweather dailyweather : dailyweathers) {
-                        page.add(dailyweather.getCid());
+                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                    for (Dailyweather dailyweather : dailyweathersbackups) {
+                        if (dailyweathers.contains(dailyweather))
+                            page.add(dailyweather.getCid());
+                        else {
+                            editor.remove(dailyweather.getCid());
+                            editor.remove(dailyweather.getCid()+"time");
+                        }
                     }
                     LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
                     Intent intent = new Intent("com.example.misaka.hw_weather.view.LOCAL_BROADCAST");
                     localBroadcastManager.sendBroadcast(intent);
-                    SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
                     editor.putString("Fragmentlist", new Gson().toJson(page));
                     editor.apply();
                     touchHelper.attachToRecyclerView(null);
@@ -145,6 +168,15 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
                     }
                 }
             }
+        }
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (!chosseboolean)
+            super.onBackPressed();
+        else {
+            this.back.callOnClick();
         }
     }
 }

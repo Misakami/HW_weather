@@ -183,7 +183,6 @@ public class WeatherActivity extends AppCompatActivity {
 
 
     class LocalReceiver extends BroadcastReceiver {
-
         @Override
         public void onReceive(Context context, Intent intent) {
             initview();

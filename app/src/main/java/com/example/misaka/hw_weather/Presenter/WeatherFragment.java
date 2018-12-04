@@ -46,7 +46,6 @@ import static android.support.constraint.Constraints.TAG;
 public class WeatherFragment extends Fragment {
 
     private String id;
-    private SharedPreferences prefer;
     private SharedPreferences.Editor editor;
     private String responseText;
     private TextView tem;
@@ -55,6 +54,10 @@ public class WeatherFragment extends Fragment {
     private RecyclerView recyclerView;
     private GridLayoutManager gridLayoutManager;
     private SwipeRefreshLayout swipeRefreshLayout;
+    private long lastupdatetime;
+    private long nowtime;
+    private boolean isfirst = false;
+    private boolean isVisible = false;
 
     public static WeatherFragment getInstance(String url) {
         WeatherFragment weatherFragment = new WeatherFragment();
@@ -64,32 +67,44 @@ public class WeatherFragment extends Fragment {
         return weatherFragment;
     }
 
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        Bundle arguments = this.getArguments();
+        id = arguments.getString("url");
+    }
+
     @Nullable
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.weather_demo, container, false);
-        Bundle arguments = this.getArguments();
-        id = arguments.getString("url");
+
+
         swipeRefreshLayout = view.findViewById(R.id.swipe);
-        prefer = PreferenceManager.getDefaultSharedPreferences(getContext());
+        SharedPreferences prefer = PreferenceManager.getDefaultSharedPreferences(getContext());
         responseText = prefer.getString(id, "");
+        lastupdatetime = prefer.getLong(id + "time", 0);
+        nowtime = System.currentTimeMillis();
+
         if (!responseText.equals("")) {
             showinfo(responseText, view);
         } else
+            isfirst = true;
+        //1小时为更新节点
+        if (nowtime - lastupdatetime > 60 * 60 * 1000 && isVisible) {
             queryWeather(view, id);
-
-
+        }
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
                 queryWeather(view, id);
-                swipeRefreshLayout.setRefreshing(false);
             }
         });
         return view;
     }
 
     private void queryWeather(final View view, final String id) {
+        swipeRefreshLayout.setRefreshing(true);
         OkHttpClient okHttpClient = Httpclient.instance.getClient();
 
         Request request = new Request.Builder()
@@ -100,16 +115,19 @@ public class WeatherFragment extends Fragment {
             public void onFailure(Call call, IOException e) {
                 Toast.makeText(getActivity(), "失败", Toast.LENGTH_SHORT).show();
             }
+
             @Override
             public void onResponse(Call call, Response response) throws IOException {
                 responseText = response.body().string();
+                nowtime = System.currentTimeMillis();
+                lastupdatetime = nowtime;
                 editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                editor.putLong(id + "time", nowtime);
                 editor.putString(id, responseText);
                 editor.apply();
                 showinfo(responseText, view);
             }
         });
-        swipeRefreshLayout = view.findViewById(R.id.swipe);
     }
 
     private void showinfo(String responseText, final View view) {
@@ -152,7 +170,6 @@ public class WeatherFragment extends Fragment {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
-                        Log.e(TAG, "run: " + id);
                         recyclerView = view.findViewById(R.id.recyclerview);
                         gridLayoutManager = new GridLayoutManager(getContext(), 1);
                         recyclerView.setLayoutManager(gridLayoutManager);
@@ -160,11 +177,26 @@ public class WeatherFragment extends Fragment {
                         recyclerView.setAdapter(adapter);
                         tem = view.findViewById(R.id.temp);
                         tem.setText(spannableString);
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 });
             }
         } catch (JSONException e) {
             e.printStackTrace();
+        }
+    }
+
+    @Override
+    public void setUserVisibleHint(boolean isVisibleToUser) {
+        super.setUserVisibleHint(isVisibleToUser);
+        if (isVisibleToUser) {
+            isVisible = true;
+            nowtime = System.currentTimeMillis();
+            if (nowtime - lastupdatetime > 60 * 60* 1000 && getView() != null) {
+                if (!isfirst)
+                    Toast.makeText(getContext(), "数据过期,正在更新", Toast.LENGTH_SHORT).show();
+                queryWeather(getView(), id);
+            }
         }
     }
 

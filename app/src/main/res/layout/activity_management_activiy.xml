@@ -18,8 +18,9 @@
 
             <Button
                 android:id="@+id/back"
+                android:background="@mipmap/goback"
                 android:layout_width="30dp"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_gravity="start" />
 
             <TextView
@@ -30,9 +31,10 @@
                 android:textSize="15sp" />
 
             <Button
+                android:background="@mipmap/setdo"
                 android:id="@+id/change"
                 android:layout_width="30dp"
-                android:layout_height="wrap_content"
+                android:layout_height="30dp"
                 android:layout_gravity="end"
                 android:layout_marginEnd="20dp" />
         </android.support.v7.widget.Toolbar>
