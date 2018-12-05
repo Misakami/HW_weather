@@ -40,8 +40,6 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-import static android.support.constraint.Constraints.TAG;
-
 
 public class WeatherFragment extends Fragment {
 
@@ -78,7 +76,6 @@ public class WeatherFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         final View view = inflater.inflate(R.layout.weather_demo, container, false);
-
 
         swipeRefreshLayout = view.findViewById(R.id.swipe);
         SharedPreferences prefer = PreferenceManager.getDefaultSharedPreferences(getContext());
@@ -192,7 +189,7 @@ public class WeatherFragment extends Fragment {
         if (isVisibleToUser) {
             isVisible = true;
             nowtime = System.currentTimeMillis();
-            if (nowtime - lastupdatetime > 60 * 60* 1000 && getView() != null) {
+            if (nowtime - lastupdatetime > 60 * 60 * 1000 && getView() != null) {
                 if (!isfirst)
                     Toast.makeText(getContext(), "数据过期,正在更新", Toast.LENGTH_SHORT).show();
                 queryWeather(getView(), id);
