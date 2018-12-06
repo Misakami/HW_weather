@@ -29,6 +29,7 @@ import org.litepal.LitePal;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -84,10 +85,13 @@ public class ChooseAreaFragment extends Fragment {
                 }else if (level == LEVEL_COUNTY){
                     selectedCounty = countyList.get(position);
                     WeatherActivity weatherActivity = (WeatherActivity) getActivity();
-                    weatherActivity.drawerLayout.closeDrawers();
-                    weatherActivity.addList(selectedCounty.getWeatherid());
-                    level = LEVEL_PROVINCE;
-                    queryProvinces();
+                    if (Utility.isNetworkAvailable(Objects.requireNonNull(getContext()))) {
+                        weatherActivity.drawerLayout.closeDrawers();
+                        weatherActivity.addList(selectedCounty.getWeatherid());
+                        level = LEVEL_PROVINCE;
+                        queryProvinces();
+                    }else
+                        Toast.makeText(getContext(),"没有网络",Toast.LENGTH_SHORT).show();
                 }
             }
         });

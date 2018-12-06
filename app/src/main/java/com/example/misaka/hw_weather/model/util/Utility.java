@@ -1,4 +1,7 @@
 package com.example.misaka.hw_weather.model.util;
+import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.text.TextUtils;
 import com.example.misaka.hw_weather.model.db.City;
 import com.example.misaka.hw_weather.model.db.County;
@@ -8,6 +11,17 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class Utility {
+    //判断联网
+    public static boolean isNetworkAvailable(Context context){
+        ConnectivityManager manager = (ConnectivityManager)context.getApplicationContext().getSystemService(
+                Context.CONNECTIVITY_SERVICE);
+        if (null == manager)
+            return false;
+        NetworkInfo info = manager.getActiveNetworkInfo();
+        if (null == info || !info.isAvailable())
+            return false;
+        return true;
+    }
     //省解析
     public static boolean handleProvinceResponse(String response){
         if (!TextUtils.isEmpty(response)){

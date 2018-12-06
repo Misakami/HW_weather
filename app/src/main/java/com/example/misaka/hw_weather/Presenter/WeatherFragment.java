@@ -1,5 +1,6 @@
 package com.example.misaka.hw_weather.Presenter;
 
+import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,6 +25,8 @@ import com.example.misaka.hw_weather.R;
 import com.example.misaka.hw_weather.model.GSON.Forecast;
 import com.example.misaka.hw_weather.model.GSON.HeWeather6;
 import com.example.misaka.hw_weather.model.util.Httpclient;
+import com.example.misaka.hw_weather.model.util.Utility;
+import com.example.misaka.hw_weather.view.WeatherActivity;
 import com.google.gson.Gson;
 
 import org.json.JSONArray;
@@ -33,6 +36,7 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -54,6 +58,7 @@ public class WeatherFragment extends Fragment {
     private SwipeRefreshLayout swipeRefreshLayout;
     private long lastupdatetime;
     private long nowtime;
+    private WeatherActivity activity;
     private boolean isfirst = false;
     private boolean isVisible = false;
 
@@ -64,6 +69,7 @@ public class WeatherFragment extends Fragment {
         weatherFragment.setArguments(bundle);
         return weatherFragment;
     }
+
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -88,7 +94,7 @@ public class WeatherFragment extends Fragment {
         } else
             isfirst = true;
         //1小时为更新节点
-        if (nowtime - lastupdatetime > 60 * 60 * 1000 && isVisible) {
+        if (nowtime - lastupdatetime > 60 * 60 * 1000 && isVisible && Utility.isNetworkAvailable(getContext())) {
             queryWeather(view, id);
         }
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
@@ -110,7 +116,12 @@ public class WeatherFragment extends Fragment {
         okHttpClient.newCall(request).enqueue(new Callback() {
             @Override
             public void onFailure(Call call, IOException e) {
-                Toast.makeText(getActivity(), "失败", Toast.LENGTH_SHORT).show();
+                getActivity().runOnUiThread(new Runnable() {
+                    @Override
+                    public void run() {
+                        Toast.makeText(getActivity(), "失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
             }
 
             @Override
@@ -137,6 +148,7 @@ public class WeatherFragment extends Fragment {
                     @Override
                     public void run() {
                         Toast.makeText(getContext(), "暂时找不到这个城市", Toast.LENGTH_SHORT).show();
+                        swipeRefreshLayout.setRefreshing(false);
                     }
                 });
             } else {
@@ -189,12 +201,11 @@ public class WeatherFragment extends Fragment {
         if (isVisibleToUser) {
             isVisible = true;
             nowtime = System.currentTimeMillis();
-            if (nowtime - lastupdatetime > 60 * 60 * 1000 && getView() != null) {
+            if (nowtime - lastupdatetime > 60 * 60 * 1000 && getView() != null && Utility.isNetworkAvailable(Objects.requireNonNull(getContext()))) {
                 if (!isfirst)
                     Toast.makeText(getContext(), "数据过期,正在更新", Toast.LENGTH_SHORT).show();
                 queryWeather(getView(), id);
             }
         }
     }
-
 }

@@ -3,7 +3,7 @@
     package="com.example.misaka.hw_weather">
 
     <uses-permission android:name="android.permission.INTERNET" />
-
+    <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
     <application
         android:name="org.litepal.LitePalApplication"
         android:allowBackup="true"
@@ -20,14 +20,12 @@
             </intent-filter>
         </activity>
         <activity android:name=".view.ManagementActiviy" />
-        <service
-            android:name=".Presenter.AutoUpdateService"
-            android:enabled="true"
-            android:exported="true">
+        <service android:name=".Presenter.AutoUpdateService">
         </service>
         <receiver android:name=".Presenter.WeatherAppWidgetProvider">
-            <intent-filter>
-                <action android:name="android.appwidget.action.APPWIDGET_UPDATE"/>
+            <intent-filter android:priority="2147483647">
+                <action android:name="update" />
+                <action android:name="android.appwidget.action.APPWIDGET_UPDATE" />
             </intent-filter>
             <meta-data
                 android:name="android.appwidget.provider"

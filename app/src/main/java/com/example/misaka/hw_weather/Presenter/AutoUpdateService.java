@@ -1,82 +1,107 @@
 package com.example.misaka.hw_weather.Presenter;
 
-import android.app.AlarmManager;
-import android.app.PendingIntent;
-import android.app.Service;
-import android.content.Intent;
-import android.content.SharedPreferences;
-import android.os.IBinder;
-import android.os.SystemClock;
-import android.preference.PreferenceManager;
-import android.widget.Toast;
 
+import android.app.Service;
+import android.appwidget.AppWidgetManager;
+import android.content.ComponentName;
+import android.content.Intent;
+import android.os.IBinder;
+
+import android.support.annotation.Nullable;
+
+import android.util.Log;
+import android.widget.RemoteViews;
+
+
+import com.example.misaka.hw_weather.R;
+import com.example.misaka.hw_weather.model.GSON.HeWeather6;
 import com.example.misaka.hw_weather.model.util.Httpclient;
+import com.example.misaka.hw_weather.model.util.Utility;
+
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+
+import org.json.JSONArray;
+import org.json.JSONException;
+import org.json.JSONObject;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.Timer;
+import java.util.TimerTask;
 
-import okhttp3.Call;
-import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+import static android.support.constraint.Constraints.TAG;
+
+
 public class AutoUpdateService extends Service {
-    public AutoUpdateService() {
+
+    private Timer timer = null;
+
+    @Override
+    public void onCreate() {
+        super.onCreate();
+        Log.i("TAG", "定时器服务启动");
+        timer = new Timer();//更新时间
+        timer.schedule(new TimerTask() {
+            @Override
+            public void run() {
+                Log.e(TAG, "run: ？" );
+                final RemoteViews views = new RemoteViews(getPackageName(), R.layout.app_widget_noweather);
+                if (Utility.isNetworkAvailable(getApplicationContext())) {
+                    System.out.println("更新");
+                    OkHttpClient okHttpClient = Httpclient.instance.getClient();
+                    Request request = new Request.Builder()
+                            .url("https://free-api.heweather.com/s6/weather?location=auto_ip&key=78027c3cef2d4c4398f53c0cbefe57dc")
+                            .build();
+                    Response response;
+                    try {
+                        response = okHttpClient.newCall(request).execute();
+                        if (response.isSuccessful()) {
+                            String responsetext = response.body().string();
+                            try {
+                                JSONObject jsonObject = new JSONObject(responsetext);
+                                JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
+                                HeWeather6 heWeather6 = new Gson().fromJson(jsonArray.getJSONObject(0).toString(), HeWeather6.class);
+                                if (!heWeather6.status.equals("ok")){
+                                    Log.e(TAG, "用完次数 " );
+                                }else {
+                                    views.setTextViewText(R.id.widget_loaction, heWeather6.basic.location);
+                                    views.setTextViewText(R.id.widget_cond, heWeather6.now.cond_txt);
+                                    views.setTextViewText(R.id.widget_temps, String.valueOf(heWeather6.now.tmp));
+                                }
+                            } catch (JSONException e) {
+                                e.printStackTrace();
+                            }
+                        }
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                    //获得组件的服务类
+                    AppWidgetManager manager = AppWidgetManager.getInstance(getApplicationContext());
+
+                    ComponentName name = new ComponentName(
+                            getApplicationContext(),
+                            WeatherAppWidgetProvider.class);
+                    manager.updateAppWidget(name, views);
+                }
+            }
+        }, 0, 360000);
     }
 
+    @Nullable
     @Override
     public IBinder onBind(Intent intent) {
-        // TODO: Return the communication channel to the service.
-        throw new UnsupportedOperationException("Not yet implemented");
+        return null;
     }
 
     @Override
-    public int onStartCommand(Intent intent, int flags, int startId) {
-        updateWeather();
-        AlarmManager manager = (AlarmManager) getSystemService(ALARM_SERVICE);
-        int anHour = 8 * 60 * 60 * 1000;
-        long triggerAtTime = SystemClock.elapsedRealtime() + anHour;
-        Intent i = new Intent(this, AutoUpdateService.class);
-        PendingIntent pi = PendingIntent.getActivity(this, 0, i, 0);
-        manager.cancel(pi);
-        manager.set(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAtTime, pi);
-        return super.onStartCommand(intent, flags, startId);
+    public void onDestroy() {
+        Log.e(TAG, "onDestroy: service" );
+        timer.cancel();
+        timer = null;
+        super.onDestroy();
     }
 
-    private void updateWeather() {
-        List<String> pageList;
-        SharedPreferences prefs = PreferenceManager.getDefaultSharedPreferences(this);
-        String json = prefs.getString("Fragmentlist", "");
-        if (!json.equals("")) {
-            pageList = new Gson().fromJson(json, new TypeToken<ArrayList<String>>() {
-            }.getType());
-            for (String id : pageList) {
-                query(id);
-            }
-        }
-    }
-
-    private void query(final String id) {
-        OkHttpClient okHttpClient = Httpclient.instance.getClient();
-        Request request = new Request.Builder()
-                .url("https://free-api.heweather.com/s6/weather?location=" + id + "&key=78027c3cef2d4c4398f53c0cbefe57dc")
-                .build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
-            @Override
-            public void onFailure(Call call, IOException e) {
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responseText = response.body().string();
-                SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(AutoUpdateService.this).edit();
-                editor.putString(id, responseText);
-                editor.apply();
-            }
-        });
-    }
 }

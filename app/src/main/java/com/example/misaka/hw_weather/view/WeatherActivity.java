@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -24,6 +26,7 @@ import com.example.misaka.hw_weather.R;
 import com.example.misaka.hw_weather.model.GSON.HeWeather6;
 import com.example.misaka.hw_weather.model.util.ButtomDilog;
 import com.example.misaka.hw_weather.model.util.Httpclient;
+import com.example.misaka.hw_weather.model.util.Utility;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -34,7 +37,6 @@ import org.json.JSONObject;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
-
 
 import okhttp3.Call;
 import okhttp3.Callback;
@@ -79,8 +81,7 @@ public class WeatherActivity extends AppCompatActivity {
                 dilog.show();
             }
         });
-        Intent intent = new Intent(this,AutoUpdateService.class);
-        startService(intent);
+
     }
 
 
@@ -111,7 +112,7 @@ public class WeatherActivity extends AppCompatActivity {
             viewPager.setOffscreenPageLimit(3);
             weatherFragmentAdapter = new WeatherFragmentAdapter(getSupportFragmentManager(), weatherFragments);
             viewPager.setAdapter(weatherFragmentAdapter);
-        } else
+        } else if (Utility.isNetworkAvailable(this))
             webget();
     }
 
@@ -187,5 +188,11 @@ public class WeatherActivity extends AppCompatActivity {
         public void onReceive(Context context, Intent intent) {
             initview();
         }
+    }
+
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
     }
 }
