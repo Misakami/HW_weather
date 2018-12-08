@@ -69,7 +69,7 @@ public class AutoUpdateService extends Service {
                                 }else {
                                     views.setTextViewText(R.id.widget_loaction, heWeather6.basic.location);
                                     views.setTextViewText(R.id.widget_cond, heWeather6.now.cond_txt);
-                                    views.setTextViewText(R.id.widget_temps, String.valueOf(heWeather6.now.tmp));
+                                    views.setTextViewText(R.id.widget_temps, String.valueOf(heWeather6.now.tmp)+"°C");
                                 }
                             } catch (JSONException e) {
                                 e.printStackTrace();
