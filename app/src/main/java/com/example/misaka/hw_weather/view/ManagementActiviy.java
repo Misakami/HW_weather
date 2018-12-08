@@ -13,12 +13,11 @@ import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.misaka.hw_weather.Presenter.DailyWeatherAdapter;
-import com.example.misaka.hw_weather.Presenter.Dailyweather;
+import com.example.misaka.hw_weather.presenter.DailyWeatherAdapter;
+import com.example.misaka.hw_weather.presenter.Dailyweather;
 import com.example.misaka.hw_weather.R;
 import com.example.misaka.hw_weather.model.GSON.HeWeather6;
 import com.example.misaka.hw_weather.model.util.SimpleItemTouchHelperCallback;
@@ -32,6 +31,10 @@ import org.json.JSONObject;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class ManagementActiviy extends AppCompatActivity implements View.OnClickListener {
 
     private List<Dailyweather> dailyweathers;
@@ -120,11 +123,11 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
                     List<String> page = new ArrayList<>();
                     SharedPreferences.Editor editor = PreferenceManager.getDefaultSharedPreferences(this).edit();
                     for (Dailyweather dailyweather : dailyweathersbackups) {
-                        if (dailyweathers.contains(dailyweather))
+                        if (dailyweathers.contains(dailyweather)) {
                             page.add(dailyweather.getCid());
-                        else {
+                        } else {
                             editor.remove(dailyweather.getCid());
-                            editor.remove(dailyweather.getCid()+"time");
+                            editor.remove(dailyweather.getCid() + "time");
                         }
                     }
                     LocalBroadcastManager localBroadcastManager = LocalBroadcastManager.getInstance(this);
@@ -138,6 +141,8 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
             case R.id.fab:
 
                 break;
+            default:
+                break;
         }
     }
 
@@ -145,7 +150,7 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
         dailyweathers = new ArrayList<>();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String json = pref.getString("Fragmentlist", "");
-        if (!json.equals("")) {
+        if (!"".equals(json)) {
             pageList = new Gson().fromJson(json, new TypeToken<ArrayList<String>>() {
             }.getType());
             for (int i = 0; i < pageList.size(); i++) {
@@ -173,9 +178,9 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
 
     @Override
     public void onBackPressed() {
-        if (!chosseboolean)
+        if (!chosseboolean) {
             super.onBackPressed();
-        else {
+        } else {
             this.back.callOnClick();
         }
     }

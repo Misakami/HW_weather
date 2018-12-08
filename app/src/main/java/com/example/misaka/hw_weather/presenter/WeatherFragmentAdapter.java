@@ -1,4 +1,4 @@
-package com.example.misaka.hw_weather.Presenter;
+package com.example.misaka.hw_weather.presenter;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;

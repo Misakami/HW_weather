@@ -9,18 +9,20 @@ import com.example.misaka.hw_weather.model.db.Province;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class Utility {
     //判断联网
     public static boolean isNetworkAvailable(Context context){
         ConnectivityManager manager = (ConnectivityManager)context.getApplicationContext().getSystemService(
                 Context.CONNECTIVITY_SERVICE);
-        if (null == manager)
+        if (null == manager) {
             return false;
+        }
         NetworkInfo info = manager.getActiveNetworkInfo();
-        if (null == info || !info.isAvailable())
-            return false;
-        return true;
+        return null != info && info.isConnected();
     }
     //省解析
     public static boolean handleProvinceResponse(String response){

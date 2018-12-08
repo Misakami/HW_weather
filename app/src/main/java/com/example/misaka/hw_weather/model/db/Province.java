@@ -1,7 +1,10 @@
 package com.example.misaka.hw_weather.model.db;
 
 import org.litepal.crud.LitePalSupport;
-
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class Province extends LitePalSupport {
     private int id;
     private int provinceCode;

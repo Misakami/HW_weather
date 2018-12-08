@@ -4,12 +4,10 @@ import android.graphics.Canvas;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.helper.ItemTouchHelper;
-import android.util.Log;
-import android.view.ViewGroup;
-
-import static android.support.constraint.Constraints.TAG;
-import static android.support.v7.widget.helper.ItemTouchHelper.ACTION_STATE_DRAG;
-
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
     private ItemTouchHelperAdapter mAdapter;
 
@@ -17,25 +15,26 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         this.mAdapter = mAdapter;
     }
 
-    //获得拖动方式
     @Override
     public int getMovementFlags(@NonNull RecyclerView recyclerView, @NonNull RecyclerView.ViewHolder viewHolder) {
         //第一个不能拖拽滑动
         if (viewHolder.getAdapterPosition() == 0) {
             return 0;
         }
-        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;        //允许上下的拖动
-        int swipeFlags = ItemTouchHelper.LEFT;   //同时允许从右向左侧滑
+        //允许上下的拖动
+        int dragFlags = ItemTouchHelper.UP | ItemTouchHelper.DOWN;
+        //同时允许从右向左侧滑
+        int swipeFlags = ItemTouchHelper.LEFT;
         return makeMovementFlags(dragFlags, swipeFlags);
     }
 
-    //允许长按
+
     @Override
     public boolean isLongPressDragEnabled() {
         return true;
     }
 
-    //允许滑动
+
     @Override
     public boolean isItemViewSwipeEnabled() {
         return true;
@@ -70,8 +69,8 @@ public class SimpleItemTouchHelperCallback extends ItemTouchHelper.Callback {
         if (dY < -(num - 1) * height) {
             dY = -(num - 1) * height;
         }
-        if (dY > (i - num) * height -height/2) {
-            dY = (i - num) * height -height/2;
+        if (dY > (i - num) * height - height / 2) {
+            dY = (i - num) * height - height / 2;
         }
         super.onChildDraw(c, recyclerView, viewHolder, dX, dY, actionState, isCurrentlyActive);
     }

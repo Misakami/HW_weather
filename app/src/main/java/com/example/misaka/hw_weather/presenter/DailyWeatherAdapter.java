@@ -1,4 +1,4 @@
-package com.example.misaka.hw_weather.Presenter;
+package com.example.misaka.hw_weather.presenter;
 
 import android.content.Context;
 import android.support.annotation.NonNull;
@@ -17,6 +17,10 @@ import com.example.misaka.hw_weather.model.util.ItemTouchHelperAdapter;
 import java.util.Collections;
 import java.util.List;
 
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapter.ViewHolder> implements ItemTouchHelperAdapter {
     private Context context;
     private List<Dailyweather> dailyweathers;

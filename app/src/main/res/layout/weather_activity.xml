@@ -55,7 +55,7 @@
 
     <fragment
         android:id="@+id/choose_area_fragment"
-        android:name="com.example.misaka.hw_weather.Presenter.ChooseAreaFragment"
+        android:name="com.example.misaka.hw_weather.presenter.ChooseAreaFragment"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:layout_gravity="start" />

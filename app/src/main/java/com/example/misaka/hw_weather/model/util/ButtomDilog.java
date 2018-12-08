@@ -10,13 +10,16 @@ import android.widget.Button;
 import android.widget.LinearLayout;
 
 import com.example.misaka.hw_weather.R;
-
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class ButtomDilog {
     private Context context;
     private AlertDialog.Builder builder;
     private View view;
-    private Button take_photo;
-    private Button Album;
+    private Button takePhoto;
+    private Button album;
     private Button cancel;
     private AlertDialog dialog;
 
@@ -24,17 +27,17 @@ public class ButtomDilog {
         this.context = context;
         builder =new AlertDialog.Builder(context);
         view = LayoutInflater.from(context).inflate(R.layout.layout_buttomstyle,null);
-        take_photo = (Button) view.findViewById(R.id.take_photo);
-        Album = (Button) view.findViewById(R.id.album);
+        takePhoto = (Button) view.findViewById(R.id.take_photo);
+        album = (Button) view.findViewById(R.id.album);
         cancel = (Button) view.findViewById(R.id.cancel);
         dialog = new AlertDialog.Builder(context).create();
     }
 
     public void setfirsr(View.OnClickListener listener){
-        take_photo.setOnClickListener(listener);
+        takePhoto.setOnClickListener(listener);
     }
     public void setsecond(View.OnClickListener listener){
-        Album.setOnClickListener(listener);
+        album.setOnClickListener(listener);
     }
     public void show(){
         dialog.show();

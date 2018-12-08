@@ -1,7 +1,5 @@
-package com.example.misaka.hw_weather.Presenter;
+package com.example.misaka.hw_weather.presenter;
 
-import android.app.ProgressDialog;
-import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
@@ -13,6 +11,7 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -37,11 +36,17 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
+
+
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class ChooseAreaFragment extends Fragment {
     private static final int LEVEL_PROVINCE = 0;
     private static final int LEVEL_CITY = 1;
     private static final int LEVEL_COUNTY = 2;
-    private ProgressDialog progressDialog;
+    private ProgressBar progressDialog;
     private TextView titleText;
     private Button button;
     private ListView listView;
@@ -86,12 +91,14 @@ public class ChooseAreaFragment extends Fragment {
                     selectedCounty = countyList.get(position);
                     WeatherActivity weatherActivity = (WeatherActivity) getActivity();
                     if (Utility.isNetworkAvailable(Objects.requireNonNull(getContext()))) {
+                        assert weatherActivity != null;
                         weatherActivity.drawerLayout.closeDrawers();
                         weatherActivity.addList(selectedCounty.getWeatherid());
                         level = LEVEL_PROVINCE;
                         queryProvinces();
-                    }else
-                        Toast.makeText(getContext(),"没有网络",Toast.LENGTH_SHORT).show();
+                    }else {
+                        Toast.makeText(getContext(), "没有网络", Toast.LENGTH_SHORT).show();
+                    }
                 }
             }
         });
@@ -171,8 +178,8 @@ public class ChooseAreaFragment extends Fragment {
             boolean result = false;
 
             @Override
-            public void onFailure(Call call, IOException e) {
-                getActivity().runOnUiThread(new Runnable() {
+            public void onFailure(@NonNull Call call, IOException e) {
+                Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
                         closeprogress();
@@ -182,7 +189,7 @@ public class ChooseAreaFragment extends Fragment {
             }
 
             @Override
-            public void onResponse(Call call, Response response) throws IOException {
+            public void onResponse(@NonNull Call call, @NonNull Response response) throws IOException {
                 String responseText = response.body().string();
                 if (Type == LEVEL_PROVINCE) {
                     result = Utility.handleProvinceResponse(responseText);
@@ -192,7 +199,7 @@ public class ChooseAreaFragment extends Fragment {
                     result = Utility.handleCountyResponse(responseText, selectetedCity.getId());
                 }
                 if (result) {
-                    getActivity().runOnUiThread(new Runnable() {
+                    Objects.requireNonNull(getActivity()).runOnUiThread(new Runnable() {
                         @Override
                         public void run() {
                             closeprogress();
@@ -212,16 +219,14 @@ public class ChooseAreaFragment extends Fragment {
 
     private void showprogress() {
         if (progressDialog == null) {
-            progressDialog = new ProgressDialog(getActivity());
-            progressDialog.setMessage("正在加载");
-            progressDialog.setCanceledOnTouchOutside(false);
+            progressDialog = new ProgressBar(getActivity());
         }
-        progressDialog.show();
+        progressDialog.setVisibility(View.VISIBLE);
     }
 
     private void closeprogress() {
         if (progressDialog != null) {
-            progressDialog.dismiss();
+            progressDialog.setVisibility(View.GONE);
         }
     }
 }

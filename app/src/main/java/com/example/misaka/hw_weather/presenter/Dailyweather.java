@@ -1,6 +1,10 @@
-package com.example.misaka.hw_weather.Presenter;
+package com.example.misaka.hw_weather.presenter;
 
 
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class Dailyweather {
     private String cond;
     private String imageid;

@@ -5,8 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.ConnectivityManager;
-import android.net.NetworkInfo;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
@@ -15,13 +13,11 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.view.ViewPager;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.AppCompatActivity;
-import android.util.Log;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.misaka.hw_weather.Presenter.AutoUpdateService;
-import com.example.misaka.hw_weather.Presenter.WeatherFragment;
-import com.example.misaka.hw_weather.Presenter.WeatherFragmentAdapter;
+import com.example.misaka.hw_weather.presenter.WeatherFragment;
+import com.example.misaka.hw_weather.presenter.WeatherFragmentAdapter;
 import com.example.misaka.hw_weather.R;
 import com.example.misaka.hw_weather.model.GSON.HeWeather6;
 import com.example.misaka.hw_weather.model.util.ButtomDilog;
@@ -101,7 +97,7 @@ public class WeatherActivity extends AppCompatActivity {
         weatherFragments = new ArrayList<>();
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String json = pref.getString("Fragmentlist", "");
-        if (!json.equals("")) {
+        if (!"".equals(json)) {
             pageList = new Gson().fromJson(json, new TypeToken<ArrayList<String>>() {
             }.getType());
             for (String id : pageList) {
@@ -112,8 +108,9 @@ public class WeatherActivity extends AppCompatActivity {
             viewPager.setOffscreenPageLimit(3);
             weatherFragmentAdapter = new WeatherFragmentAdapter(getSupportFragmentManager(), weatherFragments);
             viewPager.setAdapter(weatherFragmentAdapter);
-        } else if (Utility.isNetworkAvailable(this))
+        } else if (Utility.isNetworkAvailable(this)) {
             webget();
+        }
     }
 
     private void webget() {

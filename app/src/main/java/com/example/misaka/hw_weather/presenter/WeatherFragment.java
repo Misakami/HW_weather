@@ -1,6 +1,5 @@
-package com.example.misaka.hw_weather.Presenter;
+package com.example.misaka.hw_weather.presenter;
 
-import android.app.Activity;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -14,7 +13,6 @@ import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.RelativeSizeSpan;
 import android.text.style.SuperscriptSpan;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -89,10 +87,11 @@ public class WeatherFragment extends Fragment {
         lastupdatetime = prefer.getLong(id + "time", 0);
         nowtime = System.currentTimeMillis();
 
-        if (!responseText.equals("")) {
+        if (!"".equals(responseText)) {
             showinfo(responseText, view);
-        } else
+        } else {
             isfirst = true;
+        }
         //1小时为更新节点
         if (nowtime - lastupdatetime > 60 * 60 * 1000 && isVisible && Utility.isNetworkAvailable(getContext())) {
             queryWeather(view, id);
@@ -143,7 +142,7 @@ public class WeatherFragment extends Fragment {
             JSONObject jsonObject = new JSONObject(responseText);
             JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
             final HeWeather6 heWeather6 = new Gson().fromJson(jsonArray.getJSONObject(0).toString(), HeWeather6.class);
-            if (!heWeather6.status.equals("ok")) {
+            if (!"ok".equals(heWeather6.status)) {
                 getActivity().runOnUiThread(new Runnable() {
                     @Override
                     public void run() {
@@ -202,8 +201,9 @@ public class WeatherFragment extends Fragment {
             isVisible = true;
             nowtime = System.currentTimeMillis();
             if (nowtime - lastupdatetime > 60 * 60 * 1000 && getView() != null && Utility.isNetworkAvailable(Objects.requireNonNull(getContext()))) {
-                if (!isfirst)
+                if (!isfirst) {
                     Toast.makeText(getContext(), "数据过期,正在更新", Toast.LENGTH_SHORT).show();
+                }
                 queryWeather(getView(), id);
             }
         }

@@ -1,11 +1,14 @@
 package com.example.misaka.hw_weather.model.db;
 
 import org.litepal.crud.LitePalSupport;
-
+/**
+ * @author misaka
+ * @date 2018/12/8
+ */
 public class City extends LitePalSupport {
     private int id;
-    private int CityCode;
-    private String CityName;
+    private int cityCode;
+    private String cityName;
     private int provinceID;
 
     public int getId() {
@@ -17,19 +20,19 @@ public class City extends LitePalSupport {
     }
 
     public int getCityCode() {
-        return CityCode;
+        return cityCode;
     }
 
     public void setCityCode(int cityCode) {
-        CityCode = cityCode;
+        this.cityCode = cityCode;
     }
 
     public String getCityName() {
-        return CityName;
+        return cityName;
     }
 
     public void setCityName(String cityName) {
-        CityName = cityName;
+        this.cityName = cityName;
     }
 
     public int getProvinceID() {
