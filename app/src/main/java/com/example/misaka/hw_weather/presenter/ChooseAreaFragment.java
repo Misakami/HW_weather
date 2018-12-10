@@ -42,6 +42,7 @@ import okhttp3.Response;
  * @author misaka
  * @date 2018/12/8
  */
+@SuppressWarnings("ALL")
 public class ChooseAreaFragment extends Fragment {
     private static final int LEVEL_PROVINCE = 0;
     private static final int LEVEL_CITY = 1;
@@ -168,7 +169,8 @@ public class ChooseAreaFragment extends Fragment {
         }
     }
 
-    private void queryFromServer(String address, final int Type) {
+    @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming")
+    private void queryFromServer(String address, @SuppressWarnings("AlibabaLowerCamelCaseVariableNaming") final int Type) {
         showprogress();
         OkHttpClient okHttpClient = Httpclient.instance.getClient();
         Request request = new Request.Builder()

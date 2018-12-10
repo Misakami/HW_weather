@@ -44,7 +44,6 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
     private ItemTouchHelper touchHelper;
     private Button back;
     private Button change;
-    private List<String> pageList;
     private DailyWeatherAdapter dailyWeatherAdapter;
 
     @Override
@@ -151,7 +150,7 @@ public class ManagementActiviy extends AppCompatActivity implements View.OnClick
         SharedPreferences pref = PreferenceManager.getDefaultSharedPreferences(this);
         String json = pref.getString("Fragmentlist", "");
         if (!"".equals(json)) {
-            pageList = new Gson().fromJson(json, new TypeToken<ArrayList<String>>() {
+            List<String> pageList = new Gson().fromJson(json, new TypeToken<ArrayList<String>>() {
             }.getType());
             for (int i = 0; i < pageList.size(); i++) {
                 String id = pageList.get(i);

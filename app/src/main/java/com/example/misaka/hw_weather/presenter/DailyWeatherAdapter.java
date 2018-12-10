@@ -43,7 +43,8 @@ public class DailyWeatherAdapter extends RecyclerView.Adapter<DailyWeatherAdapte
         Dailyweather dailyweather = dailyweathers.get(i);
         viewHolder.temptext.setText(dailyweather.getTemp());
         viewHolder.condtext.setText(dailyweather.getCond());
-        Glide.with(context).load(dailyweather.getImageid()).into(viewHolder.imageView);
+        Glide.with(context).asDrawable().load(dailyweather.getImageid())
+                .into(viewHolder.imageView);
     }
 
     @Override

@@ -16,13 +16,13 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-import com.example.misaka.hw_weather.presenter.WeatherFragment;
-import com.example.misaka.hw_weather.presenter.WeatherFragmentAdapter;
 import com.example.misaka.hw_weather.R;
 import com.example.misaka.hw_weather.model.GSON.HeWeather6;
 import com.example.misaka.hw_weather.model.util.ButtomDilog;
 import com.example.misaka.hw_weather.model.util.Httpclient;
 import com.example.misaka.hw_weather.model.util.Utility;
+import com.example.misaka.hw_weather.presenter.WeatherFragment;
+import com.example.misaka.hw_weather.presenter.WeatherFragmentAdapter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
