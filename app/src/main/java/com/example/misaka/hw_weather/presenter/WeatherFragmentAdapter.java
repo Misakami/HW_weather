@@ -5,7 +5,10 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 
 import java.util.List;
-
+/**
+ * @author misaka
+ * @date 2018/12/11
+ */
 public class WeatherFragmentAdapter extends FragmentPagerAdapter {
     private List<WeatherFragment> fragments;
 

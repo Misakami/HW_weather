@@ -42,7 +42,10 @@ import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
 
-
+/**
+ * @author misaka
+ * @date 2018/12/11
+ */
 public class WeatherFragment extends Fragment {
 
     private String id;
