@@ -6,3 +6,5 @@ first_appdemo
 对Recycleview也有一点简单的使用。
 
 有一个垃圾的桌面小部件功能
+
+2/3/2019 更新了一下Rxjava的使用
