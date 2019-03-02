@@ -17,28 +17,19 @@ import android.view.View;
 import android.widget.Button;
 
 import com.example.misaka.hw_weather.R;
-import com.example.misaka.hw_weather.model.GSON.HeWeather6;
+import com.example.misaka.hw_weather.model.GSON.Bean;
 import com.example.misaka.hw_weather.model.util.ButtomDilog;
-import com.example.misaka.hw_weather.model.util.Httpclient;
 import com.example.misaka.hw_weather.model.util.Utility;
+import com.example.misaka.hw_weather.model.util.WeatherLodaer;
 import com.example.misaka.hw_weather.presenter.WeatherFragment;
 import com.example.misaka.hw_weather.presenter.WeatherFragmentAdapter;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-import okhttp3.Call;
-import okhttp3.Callback;
-import okhttp3.OkHttpClient;
-import okhttp3.Request;
-import okhttp3.Response;
+import io.reactivex.functions.Consumer;
 
 /**
  * @author misaka
@@ -108,7 +99,7 @@ public class WeatherActivity extends AppCompatActivity {
             }.getType());
         }
         if (Utility.isNetworkAvailable(this)) {
-            webget();
+            retorfitrx();
         } else {
             for (String id : pageList) {
                 WeatherFragment weatherFragment = WeatherFragment.getInstance(id);
@@ -121,52 +112,29 @@ public class WeatherActivity extends AppCompatActivity {
         }
     }
 
-    private void webget() {
-        OkHttpClient okHttpClient = Httpclient.instance.getClient();
-        Request request = new Request.Builder()
-                .url("https://free-api.heweather.com/s6/weather?location=auto_ip&key=78027c3cef2d4c4398f53c0cbefe57dc")
-                .build();
-        okHttpClient.newCall(request).enqueue(new Callback() {
-
-            @Override
-            public void onFailure(Call call, IOException e) {
-
-            }
-
-            @Override
-            public void onResponse(Call call, Response response) throws IOException {
-                String responsetext = response.body().string();
-                try {
-                    JSONObject jsonObject = new JSONObject(responsetext);
-                    JSONArray jsonArray = jsonObject.getJSONArray("HeWeather6");
-                    HeWeather6 heWeather6 = new Gson().fromJson(jsonArray.getJSONObject(0).toString(), HeWeather6.class);
-
-                    pageList.remove(heWeather6.basic.cid);
-                    pageList.add(0, heWeather6.basic.cid);
-
-                    editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
-                    editor.putString("Fragmentlist", new Gson().toJson(pageList));
-                    editor.apply();
-
-                    runOnUiThread(new Runnable() {
-                        @Override
-                        public void run() {
-                            for (String id : pageList) {
-                                WeatherFragment weatherFragment = WeatherFragment.getInstance(id);
-                                weatherFragments.add(weatherFragment);
-                            }
-                            viewPager = (ViewPager) findViewById(R.id.weather_page);
-                            viewPager.setOffscreenPageLimit(3);
-                            weatherFragmentAdapter = new WeatherFragmentAdapter(getSupportFragmentManager(), weatherFragments);
-                            viewPager.setAdapter(weatherFragmentAdapter);
+    private void retorfitrx(){
+        WeatherLodaer lodaer = new WeatherLodaer();
+        lodaer.getweather("auto_ip")
+                .subscribe(new Consumer<List<Bean.HeWeather6Bean>>() {
+                    @Override
+                    public void accept(List<Bean.HeWeather6Bean> heWeather6Beans) throws Exception {
+                        pageList.remove(heWeather6Beans.get(0).getBasic().getCid());
+                        pageList.add(0,heWeather6Beans.get(0).getBasic().getCid());
+                        editor = PreferenceManager.getDefaultSharedPreferences(WeatherActivity.this).edit();
+                        editor.putString("Fragmentlist", new Gson().toJson(pageList));
+                        editor.apply();
+                        for (String id : pageList) {
+                            WeatherFragment weatherFragment = WeatherFragment.getInstance(id);
+                            weatherFragments.add(weatherFragment);
                         }
-                    });
-                } catch (JSONException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+                        viewPager = (ViewPager) findViewById(R.id.weather_page);
+                        viewPager.setOffscreenPageLimit(3);
+                        weatherFragmentAdapter = new WeatherFragmentAdapter(getSupportFragmentManager(), weatherFragments);
+                        viewPager.setAdapter(weatherFragmentAdapter);
+                    }
+                });
     }
+
 
     public void addList(String cid) {
         int i = 0;

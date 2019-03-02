@@ -1,5 +1,6 @@
 package com.example.misaka.hw_weather.presenter;
 
+import android.annotation.SuppressLint;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -24,6 +25,7 @@ import com.example.misaka.hw_weather.model.GSON.Forecast;
 import com.example.misaka.hw_weather.model.GSON.HeWeather6;
 import com.example.misaka.hw_weather.model.util.Httpclient;
 import com.example.misaka.hw_weather.model.util.Utility;
+import com.example.misaka.hw_weather.model.util.WeatherLodaer;
 import com.example.misaka.hw_weather.view.WeatherActivity;
 import com.google.gson.Gson;
 
@@ -36,11 +38,13 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
+import io.reactivex.functions.Consumer;
 import okhttp3.Call;
 import okhttp3.Callback;
 import okhttp3.OkHttpClient;
 import okhttp3.Request;
 import okhttp3.Response;
+import okhttp3.ResponseBody;
 
 /**
  * @author misaka
@@ -97,17 +101,46 @@ public class WeatherFragment extends Fragment {
         }
         //1小时为更新节点
         if (nowtime - lastupdatetime > 60 * 60 * 1000 && isVisible && Utility.isNetworkAvailable(getContext())) {
-            queryWeather(view, id);
+            rxjavaquery(view, id);
         }
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                queryWeather(view, id);
+                rxjavaquery(view, id);
             }
         });
         return view;
     }
 
+
+    @SuppressLint("CheckResult")
+    private void rxjavaquery(final View view, final String id){
+        swipeRefreshLayout.setRefreshing(true);
+        WeatherLodaer lodaer =new WeatherLodaer();
+        lodaer.getweatherbody(id)
+                .subscribe(new Consumer<ResponseBody>() {
+                    @Override
+                    public void accept(ResponseBody responseBody)  {
+                        try {
+                            responseText = responseBody.string();
+                            nowtime = System.currentTimeMillis();
+                            lastupdatetime = nowtime;
+                            editor = PreferenceManager.getDefaultSharedPreferences(getActivity()).edit();
+                            editor.putLong(id + "time", nowtime);
+                            editor.putString(id, responseText);
+                            editor.apply();
+                            showinfo(responseText,view);
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }, new Consumer<Throwable>() {
+                    @Override
+                    public void accept(Throwable throwable){
+                        Toast.makeText(getActivity(), "失败", Toast.LENGTH_SHORT).show();
+                    }
+                });
+    }
     private void queryWeather(final View view, final String id) {
         swipeRefreshLayout.setRefreshing(true);
         OkHttpClient okHttpClient = Httpclient.instance.getClient();
@@ -207,7 +240,7 @@ public class WeatherFragment extends Fragment {
                 if (!isfirst) {
                     Toast.makeText(getContext(), "数据过期,正在更新", Toast.LENGTH_SHORT).show();
                 }
-                queryWeather(getView(), id);
+                rxjavaquery(getView(), id);
             }
         }
     }
